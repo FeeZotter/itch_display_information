@@ -1,16 +1,24 @@
 onOffBtn = "";
 informationPanel = "";
 
+
+  /*
+  chrome.storage.local.get(["key"]).then((result) => {
+    console.log("Value is " + result.key);
+  });
+  */
+
 let displayInformation = {
     name: "switch",
     status: true,
 };
 
 function setDisplayInformation(bool) {
-    displayInformation = {
-        name: "switch",
-        status: bool,
-    }
+    chrome.storage.local.set({ "displayInformation": bool });
+}
+
+function getDisplayInformation() {
+    return chrome.storage.local.get(["displayInformation"]).key;
 }
 
 function innit(item) {
@@ -50,26 +58,25 @@ function innit(item) {
         onOffLabel.className = "tooltip";
         onOffBtn.addEventListener('change', function() { changeStatus(this); }, false);
         
-        if(item.displayInformation === undefined)
+        if(item === undefined)
         {
-            browser.storage.local.set({ displayInformation });
+            setDisplayInformation(true);
             onOffBtn.checked = "checked";
         } 
-        else if (item.displayInformation.status)
+        else if (item)
         {
             onOffBtn.checked = "checked";
         }
         else { informationPanel.hidden = true; }
         
-        header = document.body.children[0].children[1];
-        header.insertBefore(onOffDiv, header.children[3])    
+
+        informationPanel.insertBefore(onOffDiv, informationPanel.children[0])    
     }
 }
 
 function changeStatus(btn) { 
-    informationPanel.hidden = !btn.checked; 
+    informationPanel.children[1].hidden = !btn.checked; 
     setDisplayInformation(btn.checked);
-    browser.storage.local.set({ displayInformation });
 }
 function onError(error) { console.log(error); }
-window.addEventListener("load", browser.storage.local.get("displayInformation").then(innit));
+window.addEventListener("load", innit(getDisplayInformation()));
