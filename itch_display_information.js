@@ -1,27 +1,32 @@
 onOffBtn = "";
 informationPanel = "";
 
-
-  /*
-  chrome.storage.local.get(["key"]).then((result) => {
-    console.log("Value is " + result.key);
-  });
-  */
-
-let displayInformation = {
-    name: "switch",
-    status: true,
-};
-
 function setDisplayInformation(bool) {
-    chrome.storage.local.set({ "displayInformation": bool });
+    displayInformation = {
+        name: "switch",
+        status: bool,
+    };
+    chrome.storage.local.set({ displayInformation });
 }
 
-function getDisplayInformation() {
-    return chrome.storage.local.get(["displayInformation"]).key;
-}
+getDisplayInformation = new Promise((resolve) => {
+    chrome.storage.local.get(["displayInformation"]).then((result) => {
+        if(result["displayInformation"]["status"] == undefined)
+        {
+            console.log("asdf")
+            console.log(result);
+            setDisplayInformation(true)
+            resolve(true);
+        }
+        console.log("asdf")
+        console.log(result);
+        console.log(result["displayInformation"]["status"]);
+        resolve(result["displayInformation"]["status"]);
+    });
+})
 
 function innit(item) {
+   // item = getDisplayInformation()
     informationPanel = document.querySelector('[id^="game_info_panel_"]').cloneNode(true);
     if(informationPanel != null)
     {
@@ -44,6 +49,7 @@ function innit(item) {
         document.body.appendChild(style);
 
         onOffDiv = document.createElement("div");
+        informationPanel.insertBefore(onOffDiv, informationPanel.children[0])  
         onOffLabel = document.createElement("label");
         onOffDiv.appendChild(onOffLabel);
         onOffLabelText = document.createElement("span");
@@ -57,7 +63,7 @@ function innit(item) {
         onOffBtn.type = "checkbox";
         onOffLabel.className = "tooltip";
         onOffBtn.addEventListener('change', function() { changeStatus(this); }, false);
-        
+        console.log(item)
         if(item === undefined)
         {
             setDisplayInformation(true);
@@ -67,16 +73,13 @@ function innit(item) {
         {
             onOffBtn.checked = "checked";
         }
-        else { informationPanel.hidden = true; }
-        
-
-        informationPanel.insertBefore(onOffDiv, informationPanel.children[0])    
+        else { informationPanel.childNodes[1].hidden = true; }
     }
 }
 
 function changeStatus(btn) { 
-    informationPanel.children[1].hidden = !btn.checked; 
+    informationPanel.childNodes[1].hidden = !btn.checked; 
     setDisplayInformation(btn.checked);
 }
 function onError(error) { console.log(error); }
-window.addEventListener("load", innit(getDisplayInformation()));
+window.addEventListener("load", getDisplayInformation.then((resolve) => {innit(resolve)}));
