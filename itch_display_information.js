@@ -1,5 +1,3 @@
-console.log("addon is loaded");                
-
 onOffBtn = "";
 informationPanel = "";
 
@@ -23,72 +21,55 @@ function innit(item) {
         informationPanel.id = "informationPanel";
         informationPanel.className = "user_tools information_panel";
         
+        /**
+        @media (max-width: 1300px) { .information_panel .action_btn {  font-size: 12px; }} 
+        @media (max-width: 960px) { .information_panel { position: absolute; opacity: 0; } } 
+        .tooltip { position: relative; display: inline-block; border-bottom: 1px dotted black; } 
+        .tooltip .tooltiptext { visibility: hidden; width: 120px; background-color: black; color: #fff; text-align: center; padding: 5px 0; border-radius: 6px; position: absolute; z-index: 1; } 
+        .tooltip:hover .tooltiptext { visibility: visible;} .information_panel { text-align: left; left: 0; width: 14%; color: white; margin: 0px 0px 0px 10px; font-size: 16px; } 
+        .information_panel table {  border-spacing: 0 10px; } 
+        .information_panel table tbody tr {box-shadow: 0 0 0 1px rgba(255,255,255,0.2); border-radius: 2px; background: rgba(0, 0, 0, 0.8); } 
+        .information_panel table tbody tr td {padding: .1428571429em .2857142857em; vertical-align:top; }
+         */
         style = document.createElement("style");
+        style.innerHTML = "@media (max-width: 1300px) { .information_panel .action_btn {  font-size: 12px; }} @media (max-width: 960px) { .information_panel { position: absolute; opacity: 0; } } .tooltip { position: relative; display: inline-block; border-bottom: 1px dotted black; } .tooltip .tooltiptext { visibility: hidden; width: 120px; background-color: black; color: #fff; text-align: center; padding: 5px 0; border-radius: 6px; position: absolute; z-index: 1; } .tooltip:hover .tooltiptext { visibility: visible;} .information_panel { text-align: left; left: 0; width: 14%; color: white; margin: 0px 0px 0px 10px; font-size: 16px; } .information_panel table {  border-spacing: 0 10px; } .information_panel table tbody tr {box-shadow: 0 0 0 1px rgba(255,255,255,0.2); border-radius: 2px; background: rgba(0, 0, 0, 0.8); } .information_panel table tbody tr td {padding: .1428571429em .2857142857em; vertical-align:top; } ";
         document.body.appendChild(style);
-        styleText = " @media (max-width: 1300px) { .information_panel .action_btn {  font-size: 12px; }}"
-        styleText += "@media (max-width: 960px) { .information_panel { position: absolute; opacity: 0; } }"
-        styleText += ".tooltip { position: relative; display: inline-block; border-bottom: 1px dotted black; } ";
-        styleText += ".tooltip .tooltiptext { visibility: hidden; width: 120px; background-color: black; color: #fff; text-align: center; padding: 5px 0; border-radius: 6px; position: absolute; z-index: 1; } ";
-        styleText += ".tooltip:hover .tooltiptext { visibility: visible;} ";
-        styleText += ".information_panel { text-align: left; left: 0; width: 14%; color: white; margin: 0px 0px 0px 10px; font-size: 16px; } ";
-        styleText += ".information_panel table {  border-spacing: 0 10px; } ";
-        styleText += ".information_panel table tbody tr {box-shadow: 0 0 0 1px rgba(255,255,255,0.2); border-radius: 2px; background: rgba(0, 0, 0, 0.8); } ";
-        styleText += ".information_panel table tbody tr td {padding: .1428571429em .2857142857em; vertical-align:top; } ";
-        style.innerHTML = styleText;
 
         onOffDiv = document.createElement("div");
         onOffLabel = document.createElement("label");
+        onOffDiv.appendChild(onOffLabel);
         onOffLabelText = document.createElement("span");
+        onOffLabel.appendChild(onOffLabelText);
         onOffBtn = document.createElement("input");
-        onOffBtn.addEventListener('change', function() { changeStatus(this); }, false);
-        
-        onOffLabelText.innerHTML = "show [More information] in sidebar";
+        onOffLabel.appendChild(onOffBtn);
+
         onOffLabelText.className = "tooltiptext";
-        
-        onOffBtn.name = "";
-        onOffLabel.className = "tooltip";
+        onOffLabelText.innerHTML = "show [More information] in sidebar";
+    
         onOffBtn.type = "checkbox";
+        onOffLabel.className = "tooltip";
+        onOffBtn.addEventListener('change', function() { changeStatus(this); }, false);
         
         if(item.displayInformation === undefined)
         {
-            console.log("undefined")
-            browser.storage.local.set({ displayInformation }).then(console.log(displayInformation), onError);
+            browser.storage.local.set({ displayInformation });
             onOffBtn.checked = "checked";
         } 
         else if (item.displayInformation.status)
         {
-            console.log(item.displayInformation.status)
             onOffBtn.checked = "checked";
         }
-        else
-        {
-            informationPanel.hidden = true; 
-        }
+        else { informationPanel.hidden = true; }
         
-        onOffDiv.appendChild(onOffLabel);
-        onOffLabel.appendChild(onOffBtn);
-        onOffLabel.appendChild(onOffLabelText);
         header = document.body.children[0].children[1];
         header.insertBefore(onOffDiv, header.children[3])    
     }
 }
 
 function changeStatus(btn) { 
-    console.log(btn.checked); 
-    if(btn.checked) 
-    {
-        informationPanel.hidden = false; 
-        setDisplayInformation(true);
-        browser.storage.local.set({ displayInformation }).then(console.log(displayInformation), onError);
-        console.log(browser.storage.local.get("displayInformation"));
-    }
-    else
-    {
-        informationPanel.hidden = true; 
-        setDisplayInformation(false);
-        browser.storage.local.set({ displayInformation }).then(console.log(displayInformation), onError);
-        console.log(browser.storage.local.get("displayInformation"));
-    }
+    informationPanel.hidden = !btn.checked; 
+    setDisplayInformation(btn.checked);
+    browser.storage.local.set({ displayInformation });
 }
 function onError(error) { console.log(error); }
 window.addEventListener("load", browser.storage.local.get("displayInformation").then(innit));
