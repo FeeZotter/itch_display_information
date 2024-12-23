@@ -37,9 +37,10 @@ function innit(item) {
         document.body.insertBefore(informationPanel, document.body.children[1]);
         informationPanel.id = "informationPanel";
         informationPanel.className = "user_tools information_panel";
-
+        
         //create toggle div
         onOffDiv = document.createElement("div");
+        informationPanel.insertBefore(onOffDiv, document.body.children[1])
         onOffLabel = document.createElement("label");
         onOffLabel.className = "tooltip";
         onOffDiv.appendChild(onOffLabel);
@@ -66,9 +67,6 @@ function innit(item) {
             onOffBtn.checked = "checked";
         }
         else { informationPanel.hidden = true; }
-        
-        header = document.body.children[0].children[1];
-        header.insertBefore(onOffDiv, header.children[3])    
     }
 }
 
